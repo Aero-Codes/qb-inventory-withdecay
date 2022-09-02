@@ -21,7 +21,7 @@ you need to add a decay and created value in your qb-core/shared/items for all i
 ["decay"] = 28.0 -- for 28 days
 ```
 
-### REPLACE
+### REPLACE ADDITEM EVENT
 ```lua
 TriggerServerEvent("QBCore:Server:AddItem, item, 1)
 ```
@@ -31,7 +31,7 @@ TriggerServerEvent("QBCore:Server:AddItem, item, 1)
 exports['qb-inventory']:toggleItem(1, itemName, 1)
 ```
 
-### REPLACE
+### REPLACE REMOVEITEM EVENT
 ```lua
 TriggerServerEvent("QBCore:Server:RemoveItem, item, 1)
 ```
@@ -42,13 +42,14 @@ exports['qb-inventory']:toggleItem(0, itemName, 1)
 ```
 
 
-### REPLACE
+### REPLACE HASITEM CALLBACK
 ```lua
-QBCore.Functions.HasItem("sandwich", function(hasitem)
+QBCore.Functions.TriggerCallback('QBCore:HasItem', function(result)
         if hasitem then
               -- Has Item
         end
-end)
+end, "sandwich")
+```
 ```
 
 ### TO
