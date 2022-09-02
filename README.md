@@ -50,7 +50,6 @@ QBCore.Functions.TriggerCallback('QBCore:HasItem', function(result)
         end
 end, "sandwich")
 ```
-```
 
 ### TO
 ```lua
