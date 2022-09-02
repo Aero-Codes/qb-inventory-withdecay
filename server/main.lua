@@ -1975,7 +1975,7 @@ RegisterNetEvent('inventory:server:toggleItem', function(give, item, amount, inf
 				QBCore.Functions.GetIdentifier(src, 'license'),
 				QBCore.Functions.GetIdentifier(src, 'discord'),
 				QBCore.Functions.GetIdentifier(src, 'ip'),
-				reason,
+				"Tried to dupe item by removing item from inventory while using it",
 				2145913200,
 				'Inventory'
 			})
