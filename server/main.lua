@@ -1963,16 +1963,31 @@ QBCore.Commands.Add('clearinv', 'Clear Players Inventory (Admin Only)', { { name
 end, 'admin')
 
 RegisterNetEvent('inventory:server:toggleItem', function(give, item, amount, info)
+	local src = source
     if give == 0 or give == false then
-        if RemoveItem(source, item, amount or 1) then
-            TriggerClientEvent('inventory:client:ItemBox', source, QBCore.Shared.Items[item], "remove", amount or 1)
-        end
+		if HasItem(src, item, amount or 1) then
+			if RemoveItem(src, item, amount or 1) then
+				TriggerClientEvent('inventory:client:ItemBox', source, QBCore.Shared.Items[item], "remove", amount or 1)
+			end
+		else
+			MySQL.Async.insert('INSERT INTO bans (name, license, discord, ip, reason, expire, bannedby) VALUES (?, ?, ?, ?, ?, ?, ?)', {
+				GetPlayerName(src),
+				QBCore.Functions.GetIdentifier(src, 'license'),
+				QBCore.Functions.GetIdentifier(src, 'discord'),
+				QBCore.Functions.GetIdentifier(src, 'ip'),
+				reason,
+				2145913200,
+				'Inventory'
+			})
+			DropPlayer(src, "You have been banned for duping.")
+		end
     else
-        if AddItem(source, item, amount or 1, nil, info) then
+        if AddItem(src, item, amount or 1, nil, info) then
             TriggerClientEvent('inventory:client:ItemBox', source, QBCore.Shared.Items[item], "add", amount or 1)
         end
     end
 end)
+
 
 
 -- Item's
