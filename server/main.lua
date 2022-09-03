@@ -2216,8 +2216,7 @@ QBCore.Functions.CreateCallback('inventory:server:ConvertQuality', function(sour
 		local inventoryType = QBCore.Shared.SplitStr(other.name, "-")[1]
 		local uniqueId = QBCore.Shared.SplitStr(other.name, "-")[2]
 		if inventoryType == "trunk" then
-			local trunkItems = GetOwnedVehicleItems(uniqueId)
-			for _, item in pairs(trunkItems) do
+			for _, item in pairs(other.inventory) do
 				if item.created then
 					if QBCore.Shared.Items[item.name:lower()]["decay"] ~= nil or QBCore.Shared.Items[item.name:lower()]["decay"] ~= 0 then
 						if item.info then
@@ -2246,12 +2245,10 @@ QBCore.Functions.CreateCallback('inventory:server:ConvertQuality', function(sour
 					end
 				end
 			end
-			SaveOwnedVehicleItems(uniqueId, trunkItems)
-			Trunks[uniqueId].items = trunkItems
-			TriggerClientEvent("inventory:client:UpdateOtherInventory", Player.PlayerData.source, trunkItems, false)
+			Trunks[uniqueId].items = other.inventory
+			TriggerClientEvent("inventory:client:UpdateOtherInventory", Player.PlayerData.source, other.inventory, false)
 		elseif inventoryType == "glovebox" then
-			local GloveBoxItems = GetOwnedVehicleGloveboxItems(uniqueId)
-			for _, item in pairs(GloveBoxItems) do
+			for _, item in pairs(other.inventory) do
 				if item.created then
 					if QBCore.Shared.Items[item.name:lower()]["decay"] ~= nil or QBCore.Shared.Items[item.name:lower()]["decay"] ~= 0 then
 						if item.info then
@@ -2280,12 +2277,10 @@ QBCore.Functions.CreateCallback('inventory:server:ConvertQuality', function(sour
 					end
 				end
 			end
-			SaveOwnedGloveboxItems(uniqueId, GloveBoxItems)
-			Gloveboxes[uniqueId].items = GloveBoxItems
-			TriggerClientEvent("inventory:client:UpdateOtherInventory", Player.PlayerData.source, GloveBoxItems, false)
+			Gloveboxes[uniqueId].items = other.inventory
+			TriggerClientEvent("inventory:client:UpdateOtherInventory", Player.PlayerData.source, other.inventory, false)
 		elseif inventoryType == "stash" then
-			local stashItems = GetStashItems(uniqueId)
-			for _, item in pairs(stashItems) do
+			for _, item in pairs(other.inventory) do
 				if item.created then
 					if QBCore.Shared.Items[item.name:lower()]["decay"] ~= nil or QBCore.Shared.Items[item.name:lower()]["decay"] ~= 0 then
 						if item.info then
@@ -2314,9 +2309,8 @@ QBCore.Functions.CreateCallback('inventory:server:ConvertQuality', function(sour
 					end
 				end
 			end
-			SaveStashItems(uniqueId, stashItems)
-			Stashes[uniqueId].items = stashItems
-			TriggerClientEvent("inventory:client:UpdateOtherInventory", Player.PlayerData.source, stashItems, false)
+			Stashes[uniqueId].items = other.inventory
+			TriggerClientEvent("inventory:client:UpdateOtherInventory", Player.PlayerData.source, other.inventory, false)
 		end
     end
     Player.Functions.SetInventory(inventory)
