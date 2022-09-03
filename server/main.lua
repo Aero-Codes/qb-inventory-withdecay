@@ -1262,21 +1262,18 @@ end)
 RegisterNetEvent('inventory:server:SaveInventory', function(type, id)
 	if type == "trunk" then
 		if IsVehicleOwned(id) then
-			local trunkItems = GetOwnedVehicleItems(id)
-			SaveOwnedVehicleItems(id, trunkItems)
+			SaveOwnedVehicleItems(id, Trunks[id].items)
 		else
 			Trunks[id].isOpen = false
 		end
 	elseif type == "glovebox" then
 		if (IsVehicleOwned(id)) then
-			local GloveBoxItems = GetOwnedVehicleGloveboxItems(id)
-			SaveOwnedGloveboxItems(id, GloveBoxItems)
+			SaveOwnedGloveboxItems(id, Gloveboxes[id].items)
 		else
 			Gloveboxes[id].isOpen = false
 		end
 	elseif type == "stash" then
-		local stashItems = GetStashItems(id)
-		SaveStashItems(id, stashItems)
+		SaveStashItems(id, Stashes[id].items)
 	elseif type == "drop" then
 		if Drops[id] then
 			Drops[id].isOpen = false
@@ -2232,13 +2229,14 @@ QBCore.Functions.CreateCallback('inventory:server:ConvertQuality', function(sour
 							item.info = info
 						end
 						local quality = ConvertQuality(item)
-                    	if item.info.quality then
+						item.info.quality = item.info.quality - 10
+--[[                     	if item.info.quality then
 							if quality < item.info.quality then
 								item.info.quality = quality
 							end
 						else
 							item.info = {quality = quality}
-						end
+						end ]]
 					else
 						if item.info then
 							item.info.quality = 100
@@ -2250,6 +2248,8 @@ QBCore.Functions.CreateCallback('inventory:server:ConvertQuality', function(sour
 				end
 			end
 			SaveOwnedVehicleItems(uniqueId, trunkItems)
+			Trunks[uniqueId].items = trunkItems
+			TriggerClientEvent("inventory:client:UpdateOtherInventory", Player.PlayerData.source, trunkItems, false)
 		elseif inventoryType == "glovebox" then
 			local GloveBoxItems = GetOwnedVehicleGloveboxItems(uniqueId)
 			for _, item in pairs(GloveBoxItems) do
@@ -2282,6 +2282,8 @@ QBCore.Functions.CreateCallback('inventory:server:ConvertQuality', function(sour
 				end
 			end
 			SaveOwnedGloveboxItems(uniqueId, GloveBoxItems)
+			Gloveboxes[uniqueId].items = GloveBoxItems
+			TriggerClientEvent("inventory:client:UpdateOtherInventory", Player.PlayerData.source, GloveBoxItems, false)
 		elseif inventoryType == "stash" then
 			local stashItems = GetStashItems(uniqueId)
 			for _, item in pairs(stashItems) do
@@ -2313,7 +2315,9 @@ QBCore.Functions.CreateCallback('inventory:server:ConvertQuality', function(sour
 					end
 				end
 			end
-			SaveStashItems(uniqueId, GetStashItems)
+			SaveStashItems(uniqueId, stashItems)
+			Stashes[uniqueId].items = stashItems
+			TriggerClientEvent("inventory:client:UpdateOtherInventory", Player.PlayerData.source, stashItems, false)
 		end
     end
     Player.Functions.SetInventory(inventory)
