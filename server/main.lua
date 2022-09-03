@@ -1262,18 +1262,21 @@ end)
 RegisterNetEvent('inventory:server:SaveInventory', function(type, id)
 	if type == "trunk" then
 		if IsVehicleOwned(id) then
-			SaveOwnedVehicleItems(id, Trunks[id].items)
+			local trunkItems = GetOwnedVehicleItems(id)
+			SaveOwnedVehicleItems(id, trunkItems)
 		else
 			Trunks[id].isOpen = false
 		end
 	elseif type == "glovebox" then
 		if (IsVehicleOwned(id)) then
-			SaveOwnedGloveboxItems(id, Gloveboxes[id].items)
+			local GloveBoxItems = GetOwnedVehicleGloveboxItems(id)
+			SaveOwnedGloveboxItems(id, GloveBoxItems)
 		else
 			Gloveboxes[id].isOpen = false
 		end
 	elseif type == "stash" then
-		SaveStashItems(id, Stashes[id].items)
+		local stashItems = GetStashItems(id)
+		SaveStashItems(id, stashItems)
 	elseif type == "drop" then
 		if Drops[id] then
 			Drops[id].isOpen = false
@@ -2147,6 +2150,171 @@ QBCore.Functions.CreateCallback('inventory:server:ConvertQuality', function(sour
                 end
             end
         end
+    end
+    Player.Functions.SetInventory(inventory)
+    TriggerClientEvent("inventory:client:UpdatePlayerInventory", Player.PlayerData.source, false)
+    data.inventory = inventory
+    data.other = other
+    cb(data)
+end)
+
+-- DECAY SYSTEM DON'T TOUCH UNLESS YOU KNOW WHAT YOU ARE DOING
+
+local TimeAllowed = 60 * 60 * 24 * 1 -- Maths for 1 day dont touch its very important and could break everything
+
+function ConvertQuality(item)
+	local StartDate = item.created
+    local DecayRate = QBCore.Shared.Items[item.name:lower()]["decay"] ~= nil and QBCore.Shared.Items[item.name:lower()]["decay"] or 0.0
+    if DecayRate == nil then
+        DecayRate = 0
+    end
+    local TimeExtra = math.ceil((TimeAllowed * DecayRate))
+    local percentDone = 100 - math.ceil((((os.time() - StartDate) / TimeExtra) * 100))
+    if DecayRate == 0 then
+        percentDone = 100
+    end
+    if percentDone < 0 then
+        percentDone = 0
+    end
+    return percentDone
+end
+
+QBCore.Functions.CreateCallback('inventory:server:ConvertQuality', function(source, cb, inventory, other)
+    local src = source
+    local data = {}
+    local Player = QBCore.Functions.GetPlayer(src)
+    for _, item in pairs(inventory) do
+        if item.created then
+            if QBCore.Shared.Items[item.name:lower()]["decay"] ~= nil or QBCore.Shared.Items[item.name:lower()]["decay"] ~= 0 then
+                if item.info then
+                    if type(item.info) == "string" then
+                        item.info = {}
+                    end
+                    if item.info.quality == nil then
+                        item.info.quality = 100
+                    end
+                else
+                    local info = {quality = 100}
+                    item.info = info
+                end
+                local quality = ConvertQuality(item)
+                if item.info.quality then
+                    if quality < item.info.quality then
+                        item.info.quality = quality
+                    end
+                else
+                    item.info = {quality = quality}
+                end
+            else
+                if item.info then
+                    item.info.quality = 100
+                else
+                    local info = {quality = 100}
+                    item.info = info
+                end
+            end
+        end
+    end
+    if other then
+		local inventoryType = QBCore.Shared.SplitStr(other.name, "-")[1]
+		local uniqueId = QBCore.Shared.SplitStr(other.name, "-")[2]
+		if inventoryType == "trunk" then
+			local trunkItems = GetOwnedVehicleItems(uniqueId)
+			for _, item in pairs(trunkItems) do
+				if item.created then
+					if QBCore.Shared.Items[item.name:lower()]["decay"] ~= nil or QBCore.Shared.Items[item.name:lower()]["decay"] ~= 0 then
+						if item.info then
+							if item.info.quality == nil then
+								item.info.quality = 100
+							end
+						else
+							local info = {quality = 100}
+							item.info = info
+						end
+						local quality = ConvertQuality(item)
+                    	if item.info.quality then
+							if quality < item.info.quality then
+								item.info.quality = quality
+							end
+						else
+							item.info = {quality = quality}
+						end
+					else
+						if item.info then
+							item.info.quality = 100
+						else
+							local info = {quality = 100}
+							item.info = info
+						end
+					end
+				end
+			end
+			SaveOwnedVehicleItems(uniqueId, trunkItems)
+		elseif inventoryType == "glovebox" then
+			local GloveBoxItems = GetOwnedVehicleGloveboxItems(uniqueId)
+			for _, item in pairs(GloveBoxItems) do
+				if item.created then
+					if QBCore.Shared.Items[item.name:lower()]["decay"] ~= nil or QBCore.Shared.Items[item.name:lower()]["decay"] ~= 0 then
+						if item.info then
+							if item.info.quality == nil then
+								item.info.quality = 100
+							end
+						else
+							local info = {quality = 100}
+							item.info = info
+						end
+						local quality = ConvertQuality(item)
+                    	if item.info.quality then
+							if quality < item.info.quality then
+								item.info.quality = quality
+							end
+						else
+							item.info = {quality = quality}
+						end
+					else
+						if item.info then
+							item.info.quality = 100
+						else
+							local info = {quality = 100}
+							item.info = info
+						end
+					end
+				end
+			end
+			SaveOwnedGloveboxItems(uniqueId, GloveBoxItems)
+		elseif inventoryType == "stash" then
+			local stashItems = GetStashItems(uniqueId)
+			for _, item in pairs(stashItems) do
+				if item.created then
+					if QBCore.Shared.Items[item.name:lower()]["decay"] ~= nil or QBCore.Shared.Items[item.name:lower()]["decay"] ~= 0 then
+						if item.info then
+							if item.info.quality == nil then
+								item.info.quality = 100
+							end
+						else
+							local info = {quality = 100}
+							item.info = info
+						end
+						local quality = ConvertQuality(item)
+                    	if item.info.quality then
+							if quality < item.info.quality then
+								item.info.quality = quality
+							end
+						else
+							item.info = {quality = quality}
+						end
+					else
+						if item.info then
+							item.info.quality = 100
+						else
+							local info = {quality = 100}
+							item.info = info
+						end
+					end
+				end
+			end
+			SaveStashItems(uniqueId, GetStashItems)
+		end
     end
     Player.Functions.SetInventory(inventory)
     TriggerClientEvent("inventory:client:UpdatePlayerInventory", Player.PlayerData.source, false)
