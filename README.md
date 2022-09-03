@@ -1,3 +1,7 @@
+# ADDED EXAMPLE OF ITEMS.LUA
+>### qb-core/shared/items.lua
+>### If you are lazy to put. You can use mine replace your items.lua with the one i provided and just modify the ["decay"] = 1.0 = 1 day
+
 # Inventory Decay
 
 ![image](https://user-images.githubusercontent.com/80186604/163069477-114e14ec-bec1-4f93-8421-42017c605f15.png)
