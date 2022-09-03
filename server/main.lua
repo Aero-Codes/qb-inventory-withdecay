@@ -438,6 +438,8 @@ local function GetStashItems(stashId)
 
 	for _, item in pairs(stashItems) do
 		local itemInfo = QBCore.Shared.Items[item.name:lower()]
+		local time = os.time()
+		itemInfo["created"] = itemInfo["created"] or time
 		if itemInfo then
 			items[item.slot] = {
 				name = itemInfo["name"],
@@ -450,6 +452,7 @@ local function GetStashItems(stashId)
 				unique = itemInfo["unique"],
 				useable = itemInfo["useable"],
 				image = itemInfo["image"],
+				created = itemInfo["created"],
 				slot = item.slot,
 			}
 		end
@@ -509,6 +512,7 @@ local function AddToStash(stashId, slot, otherslot, itemName, amount, info, crea
 				unique = itemInfo["unique"],
 				useable = itemInfo["useable"],
 				image = itemInfo["image"],
+				created = created,
 				slot = otherslot,
 			}
 		else
@@ -524,6 +528,7 @@ local function AddToStash(stashId, slot, otherslot, itemName, amount, info, crea
 				unique = itemInfo["unique"],
 				useable = itemInfo["useable"],
 				image = itemInfo["image"],
+				created = created,
 				slot = slot,
 			}
 		end
@@ -556,6 +561,8 @@ local function GetOwnedVehicleItems(plate)
 
 	for _, item in pairs(trunkItems) do
 		local itemInfo = QBCore.Shared.Items[item.name:lower()]
+		local time = os.time()
+		itemInfo["created"] = itemInfo["created"] or time
 		if itemInfo then
 			items[item.slot] = {
 				name = itemInfo["name"],
@@ -568,6 +575,7 @@ local function GetOwnedVehicleItems(plate)
 				unique = itemInfo["unique"],
 				useable = itemInfo["useable"],
 				image = itemInfo["image"],
+				created = itemInfo["created"],
 				slot = item.slot,
 			}
 		end
@@ -628,6 +636,7 @@ local function AddToTrunk(plate, slot, otherslot, itemName, amount, info, create
 				unique = itemInfo["unique"],
 				useable = itemInfo["useable"],
 				image = itemInfo["image"],
+				created = created,
 				slot = otherslot,
 			}
 		else
@@ -643,6 +652,7 @@ local function AddToTrunk(plate, slot, otherslot, itemName, amount, info, create
 				unique = itemInfo["unique"],
 				useable = itemInfo["useable"],
 				image = itemInfo["image"],
+				created = created,
 				slot = slot,
 			}
 		end
@@ -675,6 +685,8 @@ local function GetOwnedVehicleGloveboxItems(plate)
 
 	for _, item in pairs(gloveboxItems) do
 		local itemInfo = QBCore.Shared.Items[item.name:lower()]
+		local time = os.time()
+		itemInfo["created"] = itemInfo["created"] or time
 		if itemInfo then
 			items[item.slot] = {
 				name = itemInfo["name"],
@@ -687,6 +699,7 @@ local function GetOwnedVehicleGloveboxItems(plate)
 				unique = itemInfo["unique"],
 				useable = itemInfo["useable"],
 				image = itemInfo["image"],
+				created = itemInfo["created"],
 				slot = item.slot,
 			}
 		end
@@ -747,6 +760,7 @@ local function AddToGlovebox(plate, slot, otherslot, itemName, amount, info, cre
 				unique = itemInfo["unique"],
 				useable = itemInfo["useable"],
 				image = itemInfo["image"],
+				created = created,
 				slot = otherslot,
 			}
 		else
@@ -762,6 +776,7 @@ local function AddToGlovebox(plate, slot, otherslot, itemName, amount, info, cre
 				unique = itemInfo["unique"],
 				useable = itemInfo["useable"],
 				image = itemInfo["image"],
+				created = created,
 				slot = slot,
 			}
 		end
@@ -2041,4 +2056,101 @@ CreateUsableItem("id_card", function(source, item)
 			)
 		end
 	end
+end)
+
+
+
+-- DECAY SYSTEM DON'T TOUCH UNLESS YOU KNOW WHAT YOU ARE DOING
+
+local TimeAllowed = 60 * 60 * 24 * 1 -- Maths for 1 day dont touch its very important and could break everything
+
+function ConvertQuality(item)
+	local StartDate = item.created
+    local DecayRate = QBCore.Shared.Items[item.name:lower()]["decay"] ~= nil and QBCore.Shared.Items[item.name:lower()]["decay"] or 0.0
+    if DecayRate == nil then
+        DecayRate = 0
+    end
+    local TimeExtra = math.ceil((TimeAllowed * DecayRate))
+    local percentDone = 100 - math.ceil((((os.time() - StartDate) / TimeExtra) * 100))
+    if DecayRate == 0 then
+        percentDone = 100
+    end
+    if percentDone < 0 then
+        percentDone = 0
+    end
+    return percentDone
+end
+
+QBCore.Functions.CreateCallback('inventory:server:ConvertQuality', function(source, cb, inventory, other)
+    local src = source
+    local data = {}
+    local Player = QBCore.Functions.GetPlayer(src)
+    for _, item in pairs(inventory) do
+        if item.created then
+            if QBCore.Shared.Items[item.name:lower()]["decay"] ~= nil or QBCore.Shared.Items[item.name:lower()]["decay"] ~= 0 then
+                if item.info then
+                    if type(item.info) == "string" then
+                        item.info = {}
+                    end
+                    if item.info.quality == nil then
+                        item.info.quality = 100
+                    end
+                else
+                    local info = {quality = 100}
+                    item.info = info
+                end
+                local quality = ConvertQuality(item)
+                if item.info.quality then
+                    if quality < item.info.quality then
+                        item.info.quality = quality
+                    end
+                else
+                    item.info = {quality = quality}
+                end
+            else
+                if item.info then
+                    item.info.quality = 100
+                else
+                    local info = {quality = 100}
+                    item.info = info
+                end
+            end
+        end
+    end
+    if other then
+        for _, item in pairs(other["inventory"]) do
+            if item.created then
+                if QBCore.Shared.Items[item.name:lower()]["decay"] ~= nil or QBCore.Shared.Items[item.name:lower()]["decay"] ~= 0 then
+                    if item.info then
+                        if item.info.quality == nil then
+                            item.info.quality = 100
+                        end
+                    else
+                        local info = {quality = 100}
+                        item.info = info
+                    end
+                    local quality = ConvertQuality(item)
+                    if item.info.quality then
+                        if quality < item.info.quality then
+                            item.info.quality = quality
+                        end
+                    else
+                        item.info = {quality = quality}
+                    end
+                else
+                    if item.info then
+                        item.info.quality = 100
+                    else
+                        local info = {quality = 100}
+                        item.info = info
+                    end
+                end
+            end
+        end
+    end
+    Player.Functions.SetInventory(inventory)
+    TriggerClientEvent("inventory:client:UpdatePlayerInventory", Player.PlayerData.source, false)
+    data.inventory = inventory
+    data.other = other
+    cb(data)
 end)
