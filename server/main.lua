@@ -2229,14 +2229,13 @@ QBCore.Functions.CreateCallback('inventory:server:ConvertQuality', function(sour
 							item.info = info
 						end
 						local quality = ConvertQuality(item)
-						item.info.quality = item.info.quality - 10
---[[                     	if item.info.quality then
+                    	if item.info.quality then
 							if quality < item.info.quality then
 								item.info.quality = quality
 							end
 						else
 							item.info = {quality = quality}
-						end ]]
+						end
 					else
 						if item.info then
 							item.info.quality = 100
