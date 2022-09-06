@@ -802,6 +802,22 @@ RegisterNUICallback("PlayDropFail", function()
     PlaySound(-1, "Place_Prop_Fail", "DLC_Dmod_Prop_Editor_Sounds", 0, 0, 1)
 end)
 
+RegisterNUICallback("GiveItem", function(data, cb)
+    local player, distance = QBCore.Functions.GetClosestPlayer(GetEntityCoords(PlayerPedId()))
+    if player ~= -1 and distance < 3 then
+        if data.inventory == 'player' then
+            local playerId = GetPlayerServerId(player)
+            SetCurrentPedWeapon(PlayerPedId(),'WEAPON_UNARMED',true)
+            TriggerServerEvent("inventory:server:GiveItem", playerId, data.item.name, data.amount, data.item.slot)
+        else
+            QBCore.Functions.Notify(Lang:t("notify.notowned"), "error")
+        end
+    else
+        QBCore.Functions.Notify(Lang:t("notify.nonb"), "error")
+    end
+    cb('ok')
+end)
+
 
 -- Threads
 
