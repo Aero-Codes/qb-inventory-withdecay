@@ -323,16 +323,20 @@ RegisterNetEvent('inventory:client:OpenInventory', function(PlayerAmmo, inventor
         if other then
             currentOtherInventory = other.name
         end
-        SendNUIMessage({
-            action = "open",
-            inventory = inventory,
-            slots = Config.MaxInventorySlots,
-            other = other,
-            maxweight = Config.MaxInventoryWeight,
-            Ammo = PlayerAmmo,
-            maxammo = Config.MaximumAmmoValues
-        })
-        inInventory = true
+        QBCore.Functions.TriggerCallback('inventory:server:ConvertQuality', function(data)
+            inventory = data.inventory
+            other = data.other
+            SendNUIMessage({
+                action = "open",
+                inventory = inventory,
+                slots = Config.MaxInventorySlots,
+                other = other,
+                maxweight = Config.MaxInventoryWeight,
+                Ammo = PlayerAmmo,
+                maxammo = Config.MaximumAmmoValues
+            })
+            inInventory = true
+        end, inventory, other)
     end
 end)
 
