@@ -1876,6 +1876,47 @@ RegisterNetEvent('qb-inventory:server:SaveStashItems', function(stashId, items)
     })
 end)
 
+RegisterServerEvent("inventory:server:GiveItem", function(target, name, amount, slot)
+    local src = source
+    local Player = QBCore.Functions.GetPlayer(src)
+	target = tonumber(target)
+    local OtherPlayer = QBCore.Functions.GetPlayer(target)
+    local dist = #(GetEntityCoords(GetPlayerPed(src))-GetEntityCoords(GetPlayerPed(target)))
+	if Player == OtherPlayer then return QBCore.Functions.Notify(src, Lang:t("notify.gsitem")) end
+	if dist > 2 then return QBCore.Functions.Notify(src, Lang:t("notify.tftgitem")) end
+	local item = GetItemBySlot(src, slot)
+	if not item then QBCore.Functions.Notify(src, Lang:t("notify.infound")); return end
+	if item.name ~= name then QBCore.Functions.Notify(src, Lang:t("notify.iifound")); return end
+
+	if amount <= item.amount then
+		if amount == 0 then
+			amount = item.amount
+		end
+		if RemoveItem(src, item.name, amount, item.slot) then
+			if AddItem(target, item.name, amount, false, item.info) then
+				TriggerClientEvent('inventory:client:ItemBox',target, QBCore.Shared.Items[item.name], "add")
+				QBCore.Functions.Notify(target, Lang:t("notify.gitemrec")..amount..' '..item.label..Lang:t("notify.gitemfrom")..Player.PlayerData.charinfo.firstname.." "..Player.PlayerData.charinfo.lastname)
+				TriggerClientEvent("inventory:client:UpdatePlayerInventory", target, true)
+				TriggerClientEvent('inventory:client:ItemBox',src, QBCore.Shared.Items[item.name], "remove")
+				QBCore.Functions.Notify(src, Lang:t("notify.gitemyg") .. OtherPlayer.PlayerData.charinfo.firstname.." "..OtherPlayer.PlayerData.charinfo.lastname.. " " .. amount .. " " .. item.label .."!")
+				TriggerClientEvent("inventory:client:UpdatePlayerInventory", src, true)
+				TriggerClientEvent('qb-inventory:client:giveAnim', src)
+				TriggerClientEvent('qb-inventory:client:giveAnim', target)
+			else
+				AddItem(src, item.name, amount, item.slot, item.info)
+				QBCore.Functions.Notify(src, Lang:t("notify.gitinvfull"), "error")
+				QBCore.Functions.Notify(target, Lang:t("notify.giymif"), "error")
+				TriggerClientEvent("inventory:client:UpdatePlayerInventory", src, false)
+				TriggerClientEvent("inventory:client:UpdatePlayerInventory", target, false)
+			end
+		else
+			QBCore.Functions.Notify(src, Lang:t("notify.gitydhei"), "error")
+		end
+	else
+		QBCore.Functions.Notify(src, Lang:t("notify.gitydhitt"))
+	end
+end)
+
 RegisterNetEvent('inventory:server:snowball', function(action)
 	if action == "add" then
 		AddItem(source, "weapon_snowball")
