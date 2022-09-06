@@ -33,7 +33,7 @@ TriggerServerEvent("QBCore:Server:AddItem, item, 1)
 
 ### TO
 ```lua
-exports['qb-inventory']:toggleItem(1, itemName, 1)
+exports['lj-inventory']:toggleItem(1, itemName, 1)
 ```
 
 ### REPLACE REMOVEITEM EVENT
@@ -43,7 +43,7 @@ TriggerServerEvent("QBCore:Server:RemoveItem, item, 1)
 
 ### TO
 ```lua
-exports['qb-inventory']:toggleItem(0, itemName, 1)
+exports['lj-inventory']:toggleItem(0, itemName, 1)
 ```
 
 
