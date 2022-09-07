@@ -21,7 +21,7 @@
 # How to install lj-inventory
 * Download source files from github
 * Drag source files into your resources folder
-* Rename folder from `lj-inventory-main` to `lj-inventory`
+* Rename folder from `qb-inventory-withdecay-main` to `qb-inventory`
 
 # TO DO
 you need to add a decay and created value in your qb-core/shared/items for all items, the decay is set to be the days the item lasts
