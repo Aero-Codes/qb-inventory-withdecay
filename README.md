@@ -16,7 +16,7 @@
 >### loljoshie - lj-inventory
 >### qbcore - qb-inventory
 >### Jimathy - Toggle Item
->### Treey and not Jay - For introducing decay system
+>### Treey and Jay - For introducing decay system
 
 # How to install lj-inventory
 * Download source files from github
