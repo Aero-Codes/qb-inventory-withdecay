@@ -1,3 +1,8 @@
+### IMPORTANT! WHY DID I RENAMED THE FOLDER ?
+>### It was causing problem with the latest qb-core function, Core function was looking for qb-inventory
+>### You should name the folder to qb-inventory not (qb-inventory-withdecay) 
+
+
 # ADDED EXAMPLE OF ITEMS.LUA
 >### qb-core/shared/items.lua
 >### If you are lazy to put. You can use mine replace your items.lua with the one i provided and just modify the ["decay"] = 1.0 = 1 day
@@ -62,7 +67,3 @@ end, "sandwich")
              -- Has Item
       end
 ```
-
-### WHY DID I RENAMED THE FOLDER ?
->### It was causing problem with the latest qb-core function, Core function was looking for qb-inventory
->### You should name the folder to qb-inventory not (qb-inventory-withdecay) 
