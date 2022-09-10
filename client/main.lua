@@ -207,8 +207,12 @@ end
 
 ---Plays the opening animation of the inventory
 local function openAnim()
+    local ped = PlayerPedId()
     LoadAnimDict('pickup_object')
-    TaskPlayAnim(PlayerPedId(),'pickup_object', 'putdown_low', 5.0, 1.5, 1.0, 48, 0.0, 0, 0, 0)
+    TaskPlayAnim(ped,'pickup_object', 'putdown_low', 5.0, 1.5, 1.0, 48, 0.0, 0, 0, 0)
+    SetTimeout(500, function()
+        StopAnimTask(ped, 'pickup_object', 'putdown_low', 1.0)
+    end)
 end
 
 ---Setup item info for items from Config.CraftingItems
@@ -659,8 +663,9 @@ RegisterNetEvent('inventory:client:DropItemAnim', function()
     })
     LoadAnimDict("pickup_object")
     TaskPlayAnim(ped, "pickup_object" ,"pickup_low" ,8.0, -8.0, -1, 1, 0, false, false, false )
-    Wait(2000)
-    ClearPedTasks(ped)
+    SetTimeout(1700, function()
+        StopAnimTask(ped, 'pickup_object', 'pickup_low', -1)
+    end)
 end)
 
 RegisterNetEvent('inventory:client:SetCurrentStash', function(stash)
