@@ -778,6 +778,7 @@ function handleDragDrop() {
             toAmount = $("#item-amount").val();
 
             var toDataUnique = toInventory.find("[data-slot=" + toSlot + "]").data("item");
+            var fromDataUnique = fromInventory.find("[data-slot=" + fromSlot + "]").data("item");
 
             if (fromSlot == toSlot && fromInventory == toInventory) {
                 return;
@@ -790,7 +791,7 @@ function handleDragDrop() {
                         swap(fromSlot, toSlot, fromInventory, toInventory, toAmount);
                     }
                 } else {
-                    if (toDataUnique.unique) {
+                    if (fromDataUnique.unique == toDataUnique.unique) {
                         if (toDataUnique.combinable) {
                             if (
                                 updateweights(fromSlot, toSlot, fromInventory, toInventory, toAmount)
