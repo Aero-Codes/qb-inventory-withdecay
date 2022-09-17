@@ -792,7 +792,7 @@ function handleDragDrop() {
                     }
                 } else {
                     if (fromDataUnique.unique == toDataUnique.unique) {
-                        if (toDataUnique.combinable) {
+                        if (!toDataUnique.combinable) {
                             if (
                                 updateweights(fromSlot, toSlot, fromInventory, toInventory, toAmount)
                             ) {
