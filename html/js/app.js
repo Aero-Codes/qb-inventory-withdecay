@@ -799,7 +799,7 @@ function handleDragDrop() {
                                 swap(fromSlot, toSlot, fromInventory, toInventory, toAmount);
                             }
                         } else {
-                            return;
+                            swap(fromSlot, toSlot, fromInventory, toInventory, toAmount);
                         }
                     } else {
                         if (
